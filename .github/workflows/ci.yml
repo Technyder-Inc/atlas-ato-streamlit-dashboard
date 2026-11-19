@@ -1,0 +1,64 @@
+name: CI - lint, data contract, tests, Streamlit smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atlas-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install runtime and test dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Ruff lint
+        run: python -m ruff check .
+      - name: Validate all CSV files and relationships
+        run: python scripts/validate_data.py
+      - name: Run unit and regression tests
+        run: python -m pytest -q -m "not browser"
+      - name: Compile modules
+        run: python -m compileall -q atlas app.py scripts tests
+      - name: Start Streamlit server
+        run: |
+          nohup streamlit run app.py --server.headless true --server.port 8501 > /tmp/atlas-streamlit.log 2>&1 &
+      - name: Smoke-test Streamlit HTTP endpoint
+        run: python scripts/smoke_http.py
+      - name: Show server logs on failure
+        if: failure()
+        run: cat /tmp/atlas-streamlit.log || true
+
+  ui-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install UI test dependencies
+        run: python -m pip install pytest==9.0.2 playwright==1.57.0 Pillow==11.3.0
+      - name: Install headless Chromium
+        run: python -m playwright install --with-deps chromium
+      - name: Test all seven pages against index.html reference
+        run: python -m pytest -q -m browser tests/test_browser.py

@@ -1,0 +1,6 @@
+poam_id,application_id,control_id,finding,severity,status,due_date,github_issue_number,owner
+P-001,APP-001,AC-2,Stale user accounts,High,Open,2026-11-30,42,Platform Security
+P-002,APP-001,AU-12,Audit event gaps,High,Open,2026-12-02,46,Linux Engineering
+P-003,APP-001,CM-6,Configuration drift,Medium,In progress,2026-12-08,47,Infrastructure
+P-004,APP-001,SI-2,Missing security patches,Critical,Open,2026-11-22,49,Linux Engineering
+P-005,APP-001,SC-8,Legacy TLS,Medium,In progress,2026-12-15,50,Network Security

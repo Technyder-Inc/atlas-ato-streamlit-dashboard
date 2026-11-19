@@ -1,0 +1,32 @@
+# Python and testing
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Streamlit and deployment secrets
+.streamlit/secrets.toml
+.streamlit/secrets.*.toml
+
+# Local QA artifacts
+.dist/
+dist/
+coverage.xml
+htmlcov/
+.coverage
+*.log
+
+# Platform
+.DS_Store
+Thumbs.db
+
+# Security evidence / local exports (must not be published)
+private_data/
+security_evidence/
+*.pem
+*.key

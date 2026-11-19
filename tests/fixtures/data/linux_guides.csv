@@ -1,0 +1,6 @@
+control_id,application_id,guide_name,status,repository_path
+AC-2,APP-001,Account Management,Published,linux/rhel9/remediation/AC-2.md
+AU-12,APP-001,Audit Record Generation,Published,linux/rhel9/remediation/AU-12.md
+CM-6,APP-001,Configuration Settings,In review,linux/rhel9/remediation/CM-6.md
+SI-2,APP-001,Flaw Remediation,Draft,linux/rhel9/remediation/SI-2.md
+SC-8,APP-001,Transmission Protection,Draft,linux/rhel9/remediation/SC-8.md

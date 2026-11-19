@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atlas | ATO Executive Dashboard</title>
+<style>
+:root{font-family:Inter,system-ui,Arial,sans-serif;color:#18243a;background:#f1f5fc}*{box-sizing:border-box}body{margin:0}main{max-width:1220px;margin:auto;padding:22px}header{background:linear-gradient(115deg,#112d5d,#2459ac 60%,#6735ad);color:white;border-radius:19px;padding:26px;box-shadow:0 12px 32px #183b6c25}h1{margin:7px 0;font-size:31px}h2{font-size:17px;margin:0 0 18px}small,.sub{opacity:.75}.eyebrow{letter-spacing:2px;font-size:11px;font-weight:700}.headrow,.split{display:flex;justify-content:space-between;gap:12px;align-items:center}.pill{border-radius:20px;padding:7px 12px;background:#ffffff25;font-size:12px}.nav{display:flex;gap:8px;overflow-x:auto;margin:19px 0}.nav button{background:white;color:#375171;border:1px solid #d7e0ef;padding:11px 14px;border-radius:9px;cursor:pointer;font-weight:600;white-space:nowrap}.nav button.active{background:#2459ac;color:white}.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.kpi{padding:18px;color:white;border-radius:13px;min-height:114px;box-shadow:0 5px 15px #12325814}.kpi strong{display:block;font-size:32px;margin-bottom:8px}.kpi span{font-size:13px}.layout{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin-top:14px}.panel{background:white;border:1px solid #dfe7f3;border-radius:13px;padding:19px;margin-top:14px;box-shadow:0 3px 14px #15305008}.layout .panel{margin:0}.chartrow{display:grid;grid-template-columns:80px 1fr 55px;gap:10px;align-items:center;margin:17px 0;font-size:13px}.bar{height:12px;border-radius:10px;background:#e7edf7;overflow:hidden}.fill{height:100%;border-radius:10px}.progress{margin:22px 0}.progress .split{margin-bottom:9px;font-size:13px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:12px 9px;border-bottom:1px solid #e9eef7;text-align:left}th{color:#68788f;font-size:12px}tr:last-child td{border-bottom:0}.scroll{overflow:auto}.status{padding:5px 9px;border-radius:6px;background:#e8effc;color:#2459ac;font-size:11px;font-weight:700;white-space:nowrap}.status.approved,.status.completed,.status.published{background:#d9f6e9;color:#087a5a}.status.critical{background:#ffe0e0;color:#a71f35}.status.high{background:#fff0d8;color:#a76000}.note{font-size:12px;color:#62718a;margin-top:15px;line-height:1.5}.warning{background:#fff0d8;color:#8b5200;border-radius:9px;padding:13px;font-size:13px}.guidebtn{background:#eef1ff;color:#4735a1;border:0;border-radius:6px;padding:7px 10px;cursor:pointer}.guidebtn:hover{background:#dedbff}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#14243f;color:#d5eafa;padding:18px;border-radius:10px;font-size:12px}a{color:#2459ac}footer{color:#677a95;font-size:12px;padding:20px 0}@media(max-width:720px){main{padding:10px}.kpis{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}h1{font-size:25px}.kpi strong{font-size:27px}.headrow{align-items:start;flex-wrap:wrap}}
+</style></head><body><main><header><div class="headrow"><div><div class="eyebrow">SECURITY GOVERNANCE · RMF · NIST SP 800-53</div><h1>Atlas Platform</h1><div class="sub">APP-001 · RHEL 9 · Single-application authorization dashboard</div></div><div class="pill">SYNTHETIC DEMO DATA</div></div><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:22px"><div class="pill">ATO: In Progress</div><div class="pill">6 Assessment Activities</div><div class="pill">GitHub + Linux Remediation</div></div></header><nav class="nav" id="nav" aria-label="Dashboard sections"></nav><section id="content" aria-live="polite"></section><footer>All figures and GitHub issue numbers are fictional. GitHub links are not connected to a real repository. Engineering completion does not imply RMF control satisfaction or authorization. Never publish sensitive security evidence to a public site.</footer></main>
+<script>
+"use strict";
+const data = __ATLAS_PAYLOAD__;
+const counts = data.counts;
+const colors = ['#2563eb','#0d9488','#7c3aed','#dc8b18','#d7354b','#0891b2'];
+const sections = [
+  ['overview','Executive Overview'],['assessments','Assessments'],
+  ['controls','NIST Controls'],['docs','ATO Documents'],['poam','POA&M / Risk'],
+  ['github','GitHub Delivery'],['linux','Linux Guides']
+];
+let tab = 'overview';
+let selected = data.guides.length ? data.guides[0][0] : '';
+const esc = x => String(x ?? '').replace(/[&<>"']/g, ch => (
+  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]
+));
+const slug = x => String(x ?? '').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+const fraction = (a,b) => `${a} / ${b}`;
+const percentage = (a,b) => b > 0 ? Math.round(100*a/b) : 0;
+const pct = (f) => percentage(f[3],f[2]);
+function card(n,l,c) {
+  return `<div class="kpi" style="background:linear-gradient(130deg,${c},${c}cf)"><strong>${esc(n)}</strong><span>${esc(l)}</span></div>`;
+}
+function bar(p,c) {
+  return `<div class="bar"><div class="fill" style="width:${Math.max(0,Math.min(100,Number(p)||0))}%;background:${c}"></div></div>`;
+}
+function table(head,rows) {
+  return `<div class="scroll"><table><thead><tr>${head.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${
+    rows.length ? rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('') :
+    `<tr><td colspan="${head.length}" class="note">No records available</td></tr>`
+  }</tbody></table></div>`;
+}
+function status(x) { return `<span class="status ${slug(x)}">${esc(x)}</span>`; }
+function panel(t,html) { return `<div class="panel"><h2>${esc(t)}</h2>${html}</div>`; }
+function progress(name,p,c) {
+  return `<div class="progress"><div class="split"><span>${esc(name)}</span><strong>${p}%</strong></div>${bar(p,c)}</div>`;
+}
+function chartFamilies() {
+  return data.families.map((f,i) => `<div class="chartrow"><span>${esc(f[0])} · ${esc(f[1])}</span>${bar(pct(f),colors[i % colors.length])}<b>${pct(f)}%</b></div>`).join('');
+}
+function showTab(name) { tab=name; render(); }
+function showGuide(name) { selected=name; render(); }
+function render() {
+  document.getElementById('nav').innerHTML = sections.map(([id,t]) =>
+    `<button type="button" data-tab="${id}" class="${tab===id?'active':''}" aria-current="${tab===id?'page':'false'}">${esc(t)}</button>`
+  ).join('');
+  let html = '';
+  if (tab==='overview') {
+    html = `<div class="kpis">${card(fraction(counts.assessment_completed,counts.assessment_total),'Assessments completed',colors[0])}${card(counts.control_percent+'%','Controls implemented',colors[1])}${card(fraction(counts.docs_approved,counts.docs_total),'ATO documents approved',colors[2])}${card(counts.poams_open,'Open POA&M items',colors[3])}${card(counts.risk_critical,'Critical risk',colors[4])}${card(fraction(counts.guides_published,counts.guides_total),'Linux guides published',colors[5])}</div>`;
+    html += `<div class="layout">${panel('NIST control implementation',chartFamilies())}${panel(
+      'ATO delivery progress',
+      progress('Assessment activities',percentage(counts.assessment_completed,counts.assessment_total),colors[0])+
+      progress('Documentation approvals',percentage(counts.docs_approved,counts.docs_total),colors[2])+
+      progress('Linux guides published',percentage(counts.guides_published,counts.guides_total),colors[5])+
+      `<div class="warning">${counts.risk_critical ? 'Critical finding remains open. Authorization decision pending.' : 'No critical findings are currently open. Authorization still requires formal approval.'}</div>`
+    )}</div>`;
+  }
+  if (tab==='assessments') {
+    html = `<div class="kpis">${card(counts.assessment_total,'Assessment activities',colors[0])}${card(counts.assessment_completed,'Completed',colors[1])}${card(counts.assessment_pending,'Pending / underway',colors[3])}</div>`;
+    html += panel('Assessment history and schedule', table(
+      ['Assessment','Status','Date','Owner'],
+      data.assessments.map(a=>[esc(a[0]),status(a[1]),esc(a[2]),esc(a[3])])
+    ));
+  }
+  if (tab==='controls') {
+    html = `<div class="kpis">${card(counts.control_applicable,'Applicable controls in sample',colors[0])}${card(counts.control_implemented,'Implemented',colors[1])}${card(counts.control_missing,'Not fully implemented',colors[3])}</div>`;
+    html += panel('NIST SP 800-53 families',chartFamilies()+'<p class="note">Illustrative subset of control families, not a complete authorization baseline. Assessment results and inherited controls require separate tracking.</p>');
+  }
+  if (tab==='docs') {
+    html = `<div class="kpis">${card(counts.docs_total,'Artifacts tracked',colors[0])}${card(counts.docs_approved,'Approved',colors[1])}${card(counts.docs_pending,'Awaiting approval',colors[2])}</div>`;
+    html += panel('ATO documentation register',table(['Document','Workflow status'],data.docs.map(d=>[esc(d[0]),status(d[1])])));
+  }
+  if (tab==='poam') {
+    html = `<div class="kpis">${card(counts.poams_open,'Open POA&Ms',colors[3])}${card(counts.risk_critical,'Critical',colors[4])}${card(counts.risk_high,'High',colors[0])}</div>`;
+    html += panel('POA&M remediation register',table(
+      ['POA&M','Control','Finding','Severity','Status','GitHub Issue'],
+      data.poams.map(p=>[esc(p[0]),esc(p[1]),esc(p[2]),status(p[3]),esc(p[4]),esc(p[5])])
+    ));
+  }
+  if (tab==='github') {
+    html = `<div class="kpis">${card(counts.issues,'Linked GitHub issues',colors[0])}${card(counts.prs,'Linked pull requests',colors[2])}${card(counts.validated,'Security-validated fixes',colors[1])}</div>`;
+    html += panel('Engineering delivery and validation',table(
+      ['Issue','POA&M','PR status','Pull request','Security validation'],
+      data.github.map(x=>[esc(x[0]),esc(x[1]),status(x[2]),esc(x[3]),status(x[4])])
+    )+'<p class="note">Issue and PR identifiers are placeholders. Merging code or closing an issue does not close the POA&M until security validation is recorded in the authoritative RMF system.</p>');
+  }
+  if (tab==='linux') {
+    const g = data.guides.find(x=>x[0]===selected) || data.guides[0] || ['', 'No guides available','', ''];
+    html = `<div class="kpis">${card(counts.guides_total,'Guides tracked',colors[0])}${card(counts.guides_published,'Published',colors[1])}${card(counts.guides_pending,'Draft / review',colors[2])}</div>`;
+    html += panel('Linux remediation guide library',table(
+      ['Control','Guide','Status'],
+      data.guides.map(x=>[
+        `<button type="button" class="guidebtn" data-guide="${esc(x[0])}" aria-pressed="${x[0]===selected}">${esc(x[0])}</button>`,
+        esc(x[1]),status(x[2])
+      ])
+    ));
+    html += panel(g[0]+' — '+g[1],
+      '<div class="note">Illustrative read-only validation commands (not complete remediation instructions)</div>'+
+      `<pre>${esc(g[3])}</pre>`+
+      '<div class="note">Follow approved change control, evidence collection, and rollback procedures. Documentation and code require review before operational use.</div>'
+    );
+  }
+  document.getElementById('content').innerHTML = html;
+  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+  document.querySelectorAll('[data-guide]').forEach(b=>b.addEventListener('click',()=>showGuide(b.dataset.guide)));
+}
+const h = document.querySelector('header');
+h.querySelector('h1').textContent = data.meta.name;
+h.querySelector('.sub').textContent = `${data.meta.id} · ${data.meta.os} · Single-application authorization dashboard`;
+h.querySelectorAll('div.pill')[1].textContent = `ATO: ${data.meta.authorization_status.replace(/\b[a-z]/g,ch=>ch.toUpperCase())}`;
+h.querySelectorAll('div.pill')[2].textContent = `${counts.assessment_total} Assessment Activities`;
+render();
+</script></body></html>

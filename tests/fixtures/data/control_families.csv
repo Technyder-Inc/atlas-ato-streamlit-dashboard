@@ -1,0 +1,7 @@
+application_id,family_id,applicable_controls,implemented_controls
+APP-001,AC,24,22
+APP-001,AU,16,14
+APP-001,CM,19,15
+APP-001,IA,14,13
+APP-001,SC,21,17
+APP-001,SI,18,16

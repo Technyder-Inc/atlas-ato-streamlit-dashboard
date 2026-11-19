@@ -1,0 +1,7 @@
+assessment_id,application_id,assessment_name,status,target_or_completion_date,owner
+ASM-001,APP-001,Initial RMF Assessment,Completed,2026-09-15,Security Assessment Team
+ASM-002,APP-001,Linux STIG Assessment,Completed,2026-10-03,Linux Engineering
+ASM-003,APP-001,Vulnerability Assessment,Completed,2026-10-18,Security Operations
+ASM-004,APP-001,Control Evidence Review,Completed,2026-11-05,ISSO
+ASM-005,APP-001,POA&M Validation,In progress,2026-11-25,ISSO
+ASM-006,APP-001,Final Security Assessment,Scheduled,2026-12-05,SCA

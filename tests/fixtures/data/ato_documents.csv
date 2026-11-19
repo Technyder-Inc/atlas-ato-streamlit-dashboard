@@ -1,0 +1,10 @@
+document_id,application_id,document_name,status
+DOC-001,APP-001,System Security Plan,Approved
+DOC-002,APP-001,Security Assessment Plan,Approved
+DOC-003,APP-001,Security Assessment Report,In review
+DOC-004,APP-001,Risk Assessment Report,In review
+DOC-005,APP-001,POA&M Register,Approved
+DOC-006,APP-001,Network Diagrams,Approved
+DOC-007,APP-001,Contingency Plan,Approved
+DOC-008,APP-001,Incident Response Plan,Approved
+DOC-009,APP-001,Authorization Package,Draft
